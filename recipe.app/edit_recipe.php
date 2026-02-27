@@ -7,29 +7,23 @@ if(!isset($_SESSION['user_id'])){
 }
 include 'header.php';
 
-// جلب بيانات الوصفة
 $recipe_id = $_GET['id'];
 $res = mysqli_query($conn,"SELECT * FROM recipes WHERE id=$recipe_id");
 $recipe = mysqli_fetch_assoc($res);
 
-// التحقق من صلاحية التعديل
 if($_SESSION['user_id']!=$recipe['user_id'] && $_SESSION['role']!='chef'){
     echo "<p style='color:red; text-align:center;'>You do not have permission to edit this recipe.</p>";
     exit();
 }
 
-// معالجة التعديلات عند الضغط على زر الحفظ
 if($_SERVER['REQUEST_METHOD']=='POST'){
     $title = mysqli_real_escape_string($conn,$_POST['title']);
     $description = mysqli_real_escape_string($conn,$_POST['description']);
     $ingredients = $_POST['ingredients'];
 
-    // تحديث الوصفة
     mysqli_query($conn,"UPDATE recipes SET title='$title', description='$description' WHERE id=$recipe_id");
-    // حذف المكونات القديمة
     mysqli_query($conn,"DELETE FROM ingredients WHERE recipe_id=$recipe_id");
 
-    // إضافة المكونات الجديدة
     foreach($ingredients as $ing){
         if(!empty($ing)){
             $ing = mysqli_real_escape_string($conn,$ing);
@@ -41,7 +35,6 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
     exit();
 }
 
-// جلب المكونات الحالية للعرض
 $ing_res = mysqli_query($conn,"SELECT * FROM ingredients WHERE recipe_id=$recipe_id");
 $ingredients = [];
 while($row = mysqli_fetch_assoc($ing_res)){
@@ -56,14 +49,14 @@ while($row = mysqli_fetch_assoc($ing_res)){
     <title>Edit Recipe</title>
     <style>
         body {
-            background-color: #ffffff; /* أبيض */
-            color: #000000; /* أسود */
+            background-color: #ffffff;
+            color: #000000; 
             font-family: Arial, sans-serif;
             text-align: center;
             padding: 40px 20px;
         }
         h2 {
-            color: #2E7D32; /* أخضر */
+            color: #2E7D32; 
         }
         input[type="text"], textarea {
             width: 300px;
